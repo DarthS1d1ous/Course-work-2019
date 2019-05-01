@@ -6,7 +6,7 @@
     android:layout_height="wrap_content">
 
     <ImageView
-        android:id="@+id/ivSmallPoster"
+        android:id="@+id/ivProfile"
         android:layout_width="wrap_content"
         android:layout_height="185dp"
         android:layout_marginEnd="10dp"
@@ -20,20 +20,32 @@
         app:srcCompat="@mipmap/ic_launcher" />
 
     <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="120dp"
+        android:id="@+id/tvName"
+        android:layout_width="130dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginLeft="4dp"
         android:layout_marginTop="4dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:singleLine="true"
         android:text="TextView"
         android:textColor="@android:color/background_light"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="@+id/ivSmallPoster"
-        app:layout_constraintStart_toStartOf="@+id/ivSmallPoster"
-        app:layout_constraintTop_toBottomOf="@+id/ivSmallPoster" />
+        app:layout_constraintEnd_toEndOf="@+id/ivProfile"
+        app:layout_constraintStart_toStartOf="@+id/ivProfile"
+        app:layout_constraintTop_toBottomOf="@+id/ivProfile" />
+
+    <TextView
+        android:id="@+id/tvJob"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="2dp"
+        android:text="TextView"
+        android:textColor="@color/textColorInDetail"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@+id/ivProfile"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvName" />
 
 </android.support.constraint.ConstraintLayout>

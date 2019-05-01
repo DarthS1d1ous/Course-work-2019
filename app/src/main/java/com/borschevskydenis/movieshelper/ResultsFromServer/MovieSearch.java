@@ -58,7 +58,7 @@ public class MovieSearch {
         this.results = results;
     }
 
-    public static class ResultsBean implements Parcelable {
+    public static class ResultsBean{
         /**
          * vote_count : 1011
          * id : 984
@@ -203,70 +203,70 @@ public class MovieSearch {
             this.genre_ids = genre_ids;
         }
 
-        private ResultsBean(Parcel in){
-            Log.d(LOG_TAG, "MyObject(Parcel parcel)");
-            vote_count = in.readInt();
-            id = in.readInt();
-            boolean[] booleanValues1 = new boolean[1];
-            in.readBooleanArray(booleanValues1);
-            this.video=booleanValues1[0];
-            vote_average = in.readDouble();
-            title = in.readString();
-            popularity = in.readDouble();
-            poster_path = in.readString();
-            original_language = in.readString();
-            original_title = in.readString();
-            backdrop_path = in.readString();
-            boolean[] booleanValues2 = new boolean[1];
-            in.readBooleanArray(booleanValues2);
-            this.adult=booleanValues2[0];
-            overview = in.readString();
-            release_date = in.readString();
-            genre_ids = new ArrayList<>();
-            in.readList(genre_ids,Integer.class.getClassLoader());
-        }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            Log.d(LOG_TAG, "writeToParcel");
-            dest.writeInt(vote_count);
-            dest.writeInt(id);
-            boolean[] booleanValues1 = new boolean[1];
-            dest.writeBooleanArray(booleanValues1);
-            this.video=booleanValues1[0];
-            dest.writeDouble(vote_average);
-            dest.writeString(title);
-            dest.writeDouble(popularity);
-            dest.writeString(poster_path);
-            dest.writeString(original_language);
-            dest.writeString(original_title);
-            dest.writeString(backdrop_path);
-            boolean[] booleanValues2 = new boolean[1];
-            dest.writeBooleanArray(booleanValues2);
-            this.adult=booleanValues2[0];
-            dest.writeString(overview);
-            dest.writeString(release_date);
-            dest.writeList(genre_ids);
-        }
-        final static String LOG_TAG = "myLogs";
-
-
-        public static final Parcelable.Creator<ResultsBean> CREATOR = new Parcelable.Creator<ResultsBean>() {
-            @Override
-            public ResultsBean createFromParcel(Parcel in) {
-                Log.d(LOG_TAG, "createFromParcel");
-                return new ResultsBean(in);
-            }
-
-            @Override
-            public ResultsBean[] newArray(int size) {
-                return new ResultsBean[size];
-            }
-        };
+//        private ResultsBean(Parcel in){
+//            Log.d(LOG_TAG, "MyObject(Parcel parcel)");
+//            vote_count = in.readInt();
+//            id = in.readInt();
+//            boolean[] booleanValues1 = new boolean[1];
+//            in.readBooleanArray(booleanValues1);
+//            this.video=booleanValues1[0];
+//            vote_average = in.readDouble();
+//            title = in.readString();
+//            popularity = in.readDouble();
+//            poster_path = in.readString();
+//            original_language = in.readString();
+//            original_title = in.readString();
+//            backdrop_path = in.readString();
+//            boolean[] booleanValues2 = new boolean[1];
+//            in.readBooleanArray(booleanValues2);
+//            this.adult=booleanValues2[0];
+//            overview = in.readString();
+//            release_date = in.readString();
+//            genre_ids = new ArrayList<>();
+//            in.readList(genre_ids,Integer.class.getClassLoader());
+//        }
+//
+//        @Override
+//        public int describeContents() {
+//            return 0;
+//        }
+//
+//        @Override
+//        public void writeToParcel(Parcel dest, int flags) {
+//            Log.d(LOG_TAG, "writeToParcel");
+//            dest.writeInt(vote_count);
+//            dest.writeInt(id);
+//            boolean[] booleanValues1 = new boolean[1];
+//            dest.writeBooleanArray(booleanValues1);
+//            this.video=booleanValues1[0];
+//            dest.writeDouble(vote_average);
+//            dest.writeString(title);
+//            dest.writeDouble(popularity);
+//            dest.writeString(poster_path);
+//            dest.writeString(original_language);
+//            dest.writeString(original_title);
+//            dest.writeString(backdrop_path);
+//            boolean[] booleanValues2 = new boolean[1];
+//            dest.writeBooleanArray(booleanValues2);
+//            this.adult=booleanValues2[0];
+//            dest.writeString(overview);
+//            dest.writeString(release_date);
+//            dest.writeList(genre_ids);
+//        }
+//        final static String LOG_TAG = "myLogs";
+//
+//
+//        public static final Parcelable.Creator<ResultsBean> CREATOR = new Parcelable.Creator<ResultsBean>() {
+//            @Override
+//            public ResultsBean createFromParcel(Parcel in) {
+//                Log.d(LOG_TAG, "createFromParcel");
+//                return new ResultsBean(in);
+//            }
+//
+//            @Override
+//            public ResultsBean[] newArray(int size) {
+//                return new ResultsBean[size];
+//            }
+//        };
     }
 }

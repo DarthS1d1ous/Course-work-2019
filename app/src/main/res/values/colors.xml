@@ -2,9 +2,11 @@
 <resources>
     <color name="colorPrimary">#211B3C</color>
     <color name="colorPrimaryDark">#211B3C</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorAccent">#73D81B60</color>
     <color name="backgroundRecyclerView">#210E46</color>
     <color name="textColorInDetail">#BBBBF7</color>
     <color name="backgroungActivityDetail">#23185E</color>
-    <color name="TabLayout">#26224D</color>
+    <color name="TabLayout">#211B3C</color>
+    <color name="FloatingActionButton">#2F7070E4</color>
+    <color name="GenresItem">#278580D2</color>
 </resources>

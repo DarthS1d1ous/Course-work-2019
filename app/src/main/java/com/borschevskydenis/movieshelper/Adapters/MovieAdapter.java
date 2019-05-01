@@ -19,6 +19,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     private ArrayList<MovieSearch.ResultsBean> movies;
     private OnPosterClickListener onPosterClickListener;
+    public static Boolean isLoading;
 
     public void setOnPosterClickListener(OnPosterClickListener onPosterClickListener) {
         this.onPosterClickListener = onPosterClickListener;
@@ -42,7 +43,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     @Override
     public void onBindViewHolder(@NonNull MovieViewHolder movieViewHolder, int i) {
         MovieSearch.ResultsBean movie = movies.get(i);
-        Picasso.get().load(CommonUtils.BASE_POSTER_URL + CommonUtils.W342_SIZE + movie.getPoster_path()).into(movieViewHolder.imageViewSmallPoster);
+        if(movie.getPoster_path()!=null)
+            Picasso.get().load(CommonUtils.BASE_POSTER_URL + CommonUtils.W342_SIZE + movie.getPoster_path()).into(movieViewHolder.imageViewSmallPoster);
+        else Picasso.get().load(R.drawable.poster_is_missing).into(movieViewHolder.imageViewSmallPoster);
         movieViewHolder.textViewTitle.setText(movie.getTitle());
 //        movieViewHolder.textViewOriginalTitle.setText(movie.getOriginal_title());
 
@@ -80,6 +83,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     public void setMovies(ArrayList<MovieSearch.ResultsBean> movies) {
         this.movies = movies;
         notifyDataSetChanged();
+        isLoading=false;
     }
 
     public ArrayList<MovieSearch.ResultsBean> getMovies() {

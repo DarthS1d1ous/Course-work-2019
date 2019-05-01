@@ -1,10 +1,12 @@
 package com.borschevskydenis.movieshelper;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -15,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,8 +26,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.borschevskydenis.movieshelper.Adapters.CastAdapter;
+import com.borschevskydenis.movieshelper.Adapters.CrewAdapter;
 import com.borschevskydenis.movieshelper.Adapters.RecommendationsMoviesAdapter;
 import com.borschevskydenis.movieshelper.DB.MainViewModel;
+import com.borschevskydenis.movieshelper.ResultsFromServer.CreditsById;
 import com.borschevskydenis.movieshelper.ResultsFromServer.MovieById;
 import com.borschevskydenis.movieshelper.ResultsFromServer.MovieSearch;
 import com.borschevskydenis.movieshelper.Utils.CommonUtils;
@@ -45,8 +51,6 @@ public class DetailActivity extends AppCompatActivity {
 
     public static int PAGE = 1;
     public static final String RESULT_ID = "result_id";
-    public static final String CATEGORY_RECOMMENDATIONS = "recommendations";
-    public static final String CATEGORY_VIDEOS = "videos";
     private int id;
     private ImageView imageViewBigPoster;
     private CollapsingToolbarLayout toolbarTitle;
@@ -55,6 +59,9 @@ public class DetailActivity extends AppCompatActivity {
     private TextView tvGenres;
     private TextView tvRuntime;
     private TextView tvOverview;
+    private TextView tvRecommendationsMovies;
+    private TextView tvCast;
+    private TextView tvCrew;
     private Button btnEstimate;
     private CoordinatorLayout mCoordinatorLayout;
     private FloatingActionButton mShowFabButton;
@@ -63,8 +70,19 @@ public class DetailActivity extends AppCompatActivity {
     private MovieById movie = new MovieById();
     private MovieById favoriteMovie;
     private ArrayList<MovieSearch.ResultsBean> listOfRecommendationMovies;
+    private ArrayList<CreditsById.CrewBean> listOfCrew;
+    private ArrayList<CreditsById.CastBean> listOfCast;
 
     private SharedPreferences sharedPreferences;
+
+    private RecyclerView recyclerViewRecommendations;
+    private RecommendationsMoviesAdapter recommendationsMoviesAdapter;
+    private RecyclerView recyclerViewCrew;
+    private CrewAdapter crewAdapter;
+    private RecyclerView recyclerViewCast;
+    private CastAdapter castAdapter;
+
+
 //    private ArrayList<Videos.ResultsBean> listOfVideos;
 
 //    private YouTubePlayerView mYouTubePlayerView;
@@ -72,6 +90,7 @@ public class DetailActivity extends AppCompatActivity {
 //    private YouTubePlayerSupportFragment youTubePlayerSupportFragment;
 
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +101,9 @@ public class DetailActivity extends AppCompatActivity {
 
         viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
 
+        tvRecommendationsMovies = findViewById(R.id.recommendationsMovies);
+        tvCast = findViewById(R.id.tvCast);
+        tvCrew = findViewById(R.id.tvCrew);
         imageViewBigPoster = findViewById(R.id.toolbarImage);
         toolbarTitle = findViewById(R.id.collapsingToolbar);
         tvVoteAvarage = findViewById(R.id.voteAverage);
@@ -120,7 +142,9 @@ public class DetailActivity extends AppCompatActivity {
         /**Кнопка назад */
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar()!=null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
@@ -128,11 +152,17 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
-        final RecyclerView recyclerViewRecommendations = findViewById(R.id.recyclerViewRecommendations);
+        recyclerViewRecommendations = findViewById(R.id.recyclerViewRecommendations);
+        recyclerViewCrew = findViewById(R.id.recyclerViewCrew);
+        recyclerViewCast = findViewById(R.id.recyclerViewCast);
 //        final RecyclerView recyclerViewAdditionalMaterials = findViewById(R.id.recyclerViewAdditionalMaterials);
-        final RecommendationsMoviesAdapter movieAdapter = new RecommendationsMoviesAdapter();
+        recommendationsMoviesAdapter = new RecommendationsMoviesAdapter();
+        crewAdapter = new CrewAdapter();
+        castAdapter = new CastAdapter();
 //        final AdditionalMaterialsAdapter additionalMaterialsAdapter = new AdditionalMaterialsAdapter();
         recyclerViewRecommendations.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        recyclerViewCrew.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
+        recyclerViewCast.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
 //        recyclerViewAdditionalMaterials.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
 
         /** Получение id фильма их прошлой activity*/
@@ -144,43 +174,17 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         /** Получение подробной информации о фильмах*/
-        Retrofit retrofit = RetrofitUtils.createRetrofit();
+        getDetailInformation();
 
-        ApiInterface myInterface = retrofit.create(ApiInterface.class);
+        /** Получение рекомендованных фильмов*/
+        getRecommendationMovies();
 
-        Call<MovieById> callMovieById = myInterface.getMovie(id, CommonUtils.API_KEY, CommonUtils.LANGUAGE_RU);
+        /** Получение съёмочной группы*/
+        getCrew();
 
-        callMovieById.enqueue(new Callback<MovieById>() {
-            @Override
-            public void onResponse(Call<MovieById> call, Response<MovieById> response) {
-                movie = response.body();
-                Picasso.get().load(CommonUtils.BASE_POSTER_URL + CommonUtils.ORIGINAL_SIZE + movie.getBackdrop_path()).into(imageViewBigPoster);
-                if (movie.getTitle() != null) {
-                    toolbarTitle.setTitle(movie.getTitle());
-                }
-                if (movie.getVote_average() != 0) {
-                    tvVoteAvarage.setText(String.format(Locale.getDefault(), "%.1f", movie.getVote_average()));
-                }
-                if (movie.getRelease_date() != null && !movie.getProduction_countries().isEmpty()) {
-                    tvReleaseDateAndCountry.setText(String.format("%.4s, %s", movie.getRelease_date(), movie.getProduction_countries().get(0).getName()));
+        /** Получение актёров*/
+        getCast();
 
-                }
-                StringBuilder genres = new StringBuilder();
-                for (MovieById.GenresBean i : movie.getGenres()) {
-                    genres.append(i.getName());
-                    genres.append(", ");
-                }
-                tvGenres.setText(genres);
-                tvRuntime.setText(String.format(Locale.getDefault(), "%d мин", movie.getRuntime()));
-                if (movie.getOverview() != null)
-                    tvOverview.setText(movie.getOverview());
-            }
-
-            @Override
-            public void onFailure(Call<MovieById> call, Throwable t) {
-                t.printStackTrace();
-            }
-        });
 
         /** Получение дополнительной информации(видео)*/
 //        Retrofit retrofit3 = RetrofitUtils.createRetrofit();
@@ -212,40 +216,6 @@ public class DetailActivity extends AppCompatActivity {
 //            }
 //        });
 
-
-        /** Получение рекомендованных фильмов*/
-        Retrofit retrofit2 = RetrofitUtils.createRetrofit();
-
-        ApiInterface myInterface2 = retrofit2.create(ApiInterface.class);
-
-        Call<MovieSearch> callRecommendationsMovies = myInterface2.getRecommendationsMovie(id, CATEGORY_RECOMMENDATIONS, CommonUtils.API_KEY, CommonUtils.LANGUAGE_RU, PAGE);
-
-        callRecommendationsMovies.enqueue(new Callback<MovieSearch>() {
-            @Override
-            public void onResponse(Call<MovieSearch> call, Response<MovieSearch> response) {
-                MovieSearch search = response.body();
-                listOfRecommendationMovies = (ArrayList<MovieSearch.ResultsBean>) search.getResults();
-                if (listOfRecommendationMovies != null) {
-                    movieAdapter.setMovies(listOfRecommendationMovies);
-                    recyclerViewRecommendations.setAdapter(movieAdapter);
-                    movieAdapter.setOnPosterClickListener(new RecommendationsMoviesAdapter.OnPosterClickListener() {
-                        @Override
-                        public void onPosterClick(int position) {
-                            Intent intent = new Intent(getApplicationContext(), DetailActivity.class);
-                            int id = listOfRecommendationMovies.get(position).getId();
-                            intent.putExtra(DetailActivity.RESULT_ID, id);
-                            startActivity(intent);
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onFailure(Call<MovieSearch> call, Throwable t) {
-
-            }
-        });
-
         /** Оценка фильма*/
         btnEstimate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -259,7 +229,7 @@ public class DetailActivity extends AppCompatActivity {
         /** База данных*/
         favoriteMovie = viewModel.getMovieById(id);
         if(favoriteMovie == null){
-            mShowFabButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.star_off));
+            mShowFabButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.star_offf));
         } else {
             mShowFabButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.star_on));
         }
@@ -279,7 +249,7 @@ public class DetailActivity extends AppCompatActivity {
                             }).show();
                 } else {
                     viewModel.deleteFavoriteMovie(movie);
-                    mShowFabButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.star_off));
+                    mShowFabButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.star_offf));
                     Snackbar.make(mCoordinatorLayout,"Фильм удалён из избранного", Snackbar.LENGTH_LONG)
                             .setAction("ЗАКРЫТЬ", new View.OnClickListener() {
                                 @Override
@@ -293,26 +263,187 @@ public class DetailActivity extends AppCompatActivity {
 
     }
 
-    /**Простое меню */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_detail, menu);
-        return true;
+    /** Получение рекомендованных фильмов*/
+    public void getRecommendationMovies(){
+
+        Retrofit retrofit = RetrofitUtils.createRetrofit();
+
+        ApiInterface myInterface = retrofit.create(ApiInterface.class);
+
+        Call<MovieSearch> callRecommendationsMovies = myInterface.getRecommendationsMovie(id, CommonUtils.CATEGORY_RECOMMENDATIONS, CommonUtils.API_KEY, CommonUtils.LANGUAGE_RU, PAGE);
+
+        callRecommendationsMovies.enqueue(new Callback<MovieSearch>() {
+            @Override
+            public void onResponse(Call<MovieSearch> call, Response<MovieSearch> response) {
+                MovieSearch search = response.body();
+                listOfRecommendationMovies = (ArrayList<MovieSearch.ResultsBean>) search.getResults();
+                if (listOfRecommendationMovies != null && listOfRecommendationMovies.size() != 0) {
+                    recommendationsMoviesAdapter.setMovies(listOfRecommendationMovies);
+                    recyclerViewRecommendations.setAdapter(recommendationsMoviesAdapter);
+                    recommendationsMoviesAdapter.setOnPosterClickListener(new RecommendationsMoviesAdapter.OnPosterClickListener() {
+                        @Override
+                        public void onPosterClick(int position) {
+                            Intent intent = new Intent(getApplicationContext(), DetailActivity.class);
+                            int id = listOfRecommendationMovies.get(position).getId();
+                            intent.putExtra(DetailActivity.RESULT_ID, id);
+                            startActivity(intent);
+                        }
+                    });
+                } else tvRecommendationsMovies.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onFailure(Call<MovieSearch> call, Throwable t) {
+
+            }
+        });
     }
-    /** Переход в БД*/
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
 
-        switch (id){
-            case R.id.favoritesMovies:
-                Intent intent = new Intent(getApplicationContext(), FavoritesMoviesActivity.class);
-                startActivity(intent);
+    /** Получение подробной информации о фильмах*/
+    public void getDetailInformation(){
 
-        }
+        Retrofit retrofit = RetrofitUtils.createRetrofit();
 
-        return super.onOptionsItemSelected(item);
+        ApiInterface myInterface = retrofit.create(ApiInterface.class);
+
+        Call<MovieById> callMovieById = myInterface.getMovie(id, CommonUtils.API_KEY, CommonUtils.LANGUAGE_RU);
+
+        callMovieById.enqueue(new Callback<MovieById>() {
+            @TargetApi(Build.VERSION_CODES.M)
+            @Override
+            public void onResponse(Call<MovieById> call, Response<MovieById> response) {
+                movie = response.body();
+                if(movie.getBackdrop_path()!=null)
+                    Picasso.get().load(CommonUtils.BASE_POSTER_URL + CommonUtils.ORIGINAL_SIZE + movie.getBackdrop_path()).into(imageViewBigPoster);
+                else {
+                    Picasso.get().load(R.drawable.no_image).into(imageViewBigPoster);
+                    toolbarTitle.setExpandedTitleColor(getColor(R.color.TabLayout));
+                }
+                if (movie.getTitle() != null) {
+                    toolbarTitle.setTitle(movie.getTitle());
+                }
+                if (movie.getVote_average() != 0) {
+                    tvVoteAvarage.setText(String.format(Locale.getDefault(), "%.1f", movie.getVote_average()));
+                } else tvVoteAvarage.setText("Нет оценок");
+                if (!movie.getRelease_date().equals("") && !movie.getProduction_countries().isEmpty()) {
+                    tvReleaseDateAndCountry.setText(String.format("%.4s, %s", movie.getRelease_date(), movie.getProduction_countries().get(0).getName()));
+                } else if (!movie.getProduction_countries().isEmpty()){
+                    tvReleaseDateAndCountry.setText(String.format("%s", movie.getProduction_countries().get(0).getName()));
+                } else if (!movie.getRelease_date().equals("")) {
+                    tvReleaseDateAndCountry.setText(String.format("%.4s", movie.getRelease_date()));
+                }
+                StringBuilder genres = new StringBuilder();
+                if (movie.getGenres()!=null) {
+                    for (int i=0; i<movie.getGenres().size();i++) {
+                        MovieById.GenresBean genresBean = movie.getGenres().get(i);
+                        genres.append(genresBean.getName());
+                        if(i != movie.getGenres().size()-1)
+                            genres.append(", ");
+                    }
+                    tvGenres.setText(genres);
+                } else tvGenres.setVisibility(View.GONE);
+                tvRuntime.setText(String.format(Locale.getDefault(), "%d мин", movie.getRuntime()));
+                if (movie.getOverview() != null)
+                    tvOverview.setText(movie.getOverview());
+            }
+
+            @Override
+            public void onFailure(Call<MovieById> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
+
+    /** Получение съёмочной группы*/
+    public void getCrew(){
+        Retrofit retrofit = RetrofitUtils.createRetrofit();
+
+        ApiInterface myInterface = retrofit.create(ApiInterface.class);
+
+        Call<CreditsById> callRecommendationsMovies = myInterface.getInfoAboutMovieByCategory(id, CommonUtils.CATEGORY_CREDITS, CommonUtils.API_KEY);
+
+        callRecommendationsMovies.enqueue(new Callback<CreditsById>() {
+            @Override
+            public void onResponse(Call<CreditsById> call, Response<CreditsById> response) {
+                CreditsById search = response.body();
+                listOfCrew = (ArrayList<CreditsById.CrewBean>) search.getCrew();
+                if (listOfCrew != null && listOfCrew.size() != 0) {
+                    crewAdapter.setMovies(listOfCrew);
+                    recyclerViewCrew.setAdapter(crewAdapter);
+//                    crewAdapter.setOnPosterClickListener(new CrewAdapter.OnPosterClickListener() {
+//                        @Override
+//                        public void onPosterClick(int position) {
+//                            Intent intent = new Intent(getApplicationContext(), DetailActivity.class);
+//                            int id = listOfCrew.get(position).getId();
+//                            intent.putExtra(DetailActivity.RESULT_ID, id);
+//                            startActivity(intent);
+//                        }
+//                    });
+                } else tvCrew.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onFailure(Call<CreditsById> call, Throwable t) {
+
+            }
+        });
+    }
+
+    /** Получение актёров*/
+    public void getCast(){
+        Retrofit retrofit = RetrofitUtils.createRetrofit();
+
+        ApiInterface myInterface = retrofit.create(ApiInterface.class);
+
+        Call<CreditsById> callRecommendationsMovies = myInterface.getInfoAboutMovieByCategory(id, CommonUtils.CATEGORY_CREDITS, CommonUtils.API_KEY);
+
+        callRecommendationsMovies.enqueue(new Callback<CreditsById>() {
+            @Override
+            public void onResponse(Call<CreditsById> call, Response<CreditsById> response) {
+                CreditsById search = response.body();
+                listOfCast = (ArrayList<CreditsById.CastBean>) search.getCast();
+                if (listOfCast != null && listOfCast.size() != 0) {
+                    castAdapter.setMovies(listOfCast);
+                    recyclerViewCast.setAdapter(castAdapter);
+//                    crewAdapter.setOnPosterClickListener(new CrewAdapter.OnPosterClickListener() {
+//                        @Override
+//                        public void onPosterClick(int position) {
+//                            Intent intent = new Intent(getApplicationContext(), DetailActivity.class);
+//                            int id = listOfCrew.get(position).getId();
+//                            intent.putExtra(DetailActivity.RESULT_ID, id);
+//                            startActivity(intent);
+//                        }
+//                    });
+                } else tvCast.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onFailure(Call<CreditsById> call, Throwable t) {
+
+            }
+        });
+    }
+
+//    /**Простое меню */
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.menu_detail, menu);
+//        return true;
+//    }
+//    /** Переход в БД*/
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        int id = item.getItemId();
+//
+//        switch (id){
+//            case R.id.favoritesMovies:
+//                Intent intent = new Intent(getApplicationContext(), FavoritesMoviesActivity.class);
+//                startActivity(intent);
+//
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
     void loadRating(){
         sharedPreferences = getSharedPreferences(RatingActivity.RATING,MODE_PRIVATE);

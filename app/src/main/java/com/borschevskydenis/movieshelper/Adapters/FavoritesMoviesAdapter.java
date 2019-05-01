@@ -42,7 +42,9 @@ public class FavoritesMoviesAdapter extends RecyclerView.Adapter<FavoritesMovies
     @Override
     public void onBindViewHolder(@NonNull FavoritesMoviesAdapter.FavoriteMovieViewHolder movieViewHolder, int i) {
         MovieById movie = movies.get(i);
-        Picasso.get().load(CommonUtils.BASE_POSTER_URL + CommonUtils.ORIGINAL_SIZE + movie.getPoster_path()).into(movieViewHolder.imageViewSmallPoster);
+        if(movie.getPoster_path()!=null)
+            Picasso.get().load(CommonUtils.BASE_POSTER_URL + CommonUtils.W342_SIZE + movie.getPoster_path()).into(movieViewHolder.imageViewSmallPoster);
+        else Picasso.get().load(R.drawable.poster_is_missing).into(movieViewHolder.imageViewSmallPoster);
         movieViewHolder.textViewTitle.setText(movie.getTitle());
 //        movieViewHolder.textViewOriginalTitle.setText(movie.getOriginal_title());
 

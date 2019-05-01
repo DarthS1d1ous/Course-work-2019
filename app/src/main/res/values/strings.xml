@@ -24,4 +24,13 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="notFound">Ничего не найдено</string>
+    <string name="newMovies">Новые фильмы</string>
+    <string name="popularMovies">Популярные фильмы</string>
+    <string name="topRated">Фильмы с лучшим рейтингом</string>
+    <string name="title_activity_scrolling">ScrollingActivity</string>
+
+    <string name="crew">Над фильмом работали</string>
+    <string name="cast">Актёры</string>
+    <string name="genres">Жанры</string>
 </resources>

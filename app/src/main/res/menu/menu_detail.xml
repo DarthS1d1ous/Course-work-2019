@@ -2,12 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".DetailActivity"
-    android:background="@color/backgroungActivityDetail">
+    android:background="@color/backgroungActivityDetail"
+    tools:context=".DetailActivity">
     <item
         android:id="@+id/favoritesMovies"
+        android:background="@color/backgroungActivityDetail"
         android:orderInCategory="100"
         android:title="@string/favoritesMovies"
-        app:showAsAction="never"
-        android:background="@color/backgroungActivityDetail"/>
+        app:showAsAction="never" />
 </menu>

@@ -21,7 +21,6 @@
         android:ems="10"
         android:focusable="true"
         android:hint="Введите название фильма"
-        android:imeOptions="actionSearch"
         android:inputType="textPersonName"
         android:paddingLeft="8dp"
         android:paddingTop="8dp"
@@ -42,11 +41,43 @@
         android:layout_height="25dp"
         android:layout_gravity="end|center_vertical"
         android:background="@android:drawable/ic_delete"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/etSearch"
         app:layout_constraintEnd_toEndOf="@+id/etSearch"
         app:layout_constraintHorizontal_bias="0.979"
         app:layout_constraintStart_toStartOf="@+id/etSearch"
         app:layout_constraintTop_toTopOf="@+id/etSearch"
-        app:layout_constraintVertical_bias="0.533"
-        android:visibility="invisible"/>
+        app:layout_constraintVertical_bias="0.533" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerViewPosters"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        android:clipToPadding="false"
+        android:paddingBottom="44dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etSearch" />
+
+    <TextView
+        android:id="@+id/tvNotFound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/notFound"
+        android:textColor="@color/textColorInDetail"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.454" />
+
 </android.support.constraint.ConstraintLayout>
