@@ -11,7 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MoviesByGenre"></activity>
+        <activity android:name=".MoviesByGenre"
+            android:configChanges="orientation|screenSize"></activity>
         <activity
             android:name=".FullMoviesActivity"
             android:theme="@style/AppTheme.NoActionBar" />

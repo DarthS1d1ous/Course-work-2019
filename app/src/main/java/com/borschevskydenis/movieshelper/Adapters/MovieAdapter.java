@@ -36,7 +36,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     @NonNull
     @Override
     public MovieViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.movie_item, viewGroup, false);
+        View view = LayoutInflater.from(viewGroup.getContext())
+                .inflate(R.layout.movie_item, viewGroup, false);
         return new MovieViewHolder(view);
     }
 
@@ -44,11 +45,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     public void onBindViewHolder(@NonNull MovieViewHolder movieViewHolder, int i) {
         MovieSearch.ResultsBean movie = movies.get(i);
         if(movie.getPoster_path()!=null)
-            Picasso.get().load(CommonUtils.BASE_POSTER_URL + CommonUtils.W342_SIZE + movie.getPoster_path()).into(movieViewHolder.imageViewSmallPoster);
-        else Picasso.get().load(R.drawable.poster_is_missing).into(movieViewHolder.imageViewSmallPoster);
+            Picasso.get().load(CommonUtils.BASE_POSTER_URL + CommonUtils.W342_SIZE
+                    + movie.getPoster_path()).into(movieViewHolder.imageViewSmallPoster);
+        else Picasso.get().load(R.drawable.poster_is_missing)
+                .into(movieViewHolder.imageViewSmallPoster);
         movieViewHolder.textViewTitle.setText(movie.getTitle());
-//        movieViewHolder.textViewOriginalTitle.setText(movie.getOriginal_title());
-
     }
 
     @Override
@@ -56,19 +57,24 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         return movies.size();
     }
 
+    // Предоставляет прямую ссылку на каждый View-компонент
+    // Используется для кэширования View-компонентов
+    // и последующего быстрого доступа к ним
     class MovieViewHolder extends RecyclerView.ViewHolder{
 
+        // ViewHolder должен содержать переменные для всех
+        // View-компонентов, которым вы хотите задавать какие-либо свойства
+        // в процессе работы пользователя со списком
         private ImageView imageViewSmallPoster;
         private TextView textViewTitle;
-//        private TextView textViewOriginalTitle;
-//        private TextView textViewGenre;
 
+        // Создали конструктор, который принимает на вход View-компонент строкИ
+        // и ищет все дочерние компоненты и устанавлие clickListener
+        // на один из элементов
         public MovieViewHolder(@NonNull View itemView) {
             super(itemView);
             imageViewSmallPoster = itemView.findViewById(R.id.ivSmallPoster);
             textViewTitle = itemView.findViewById(R.id.tvTitle);
-//            textViewOriginalTitle = itemView.findViewById(R.id.tvOriginalTitle);
-//            textViewGenre = itemView.findViewById(R.id.tvGenre);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

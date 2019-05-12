@@ -239,9 +239,11 @@ public class DetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 favoriteMovie = viewModel.getMovieById(id);
                 if(favoriteMovie == null){
-                    mShowFabButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.star_on));
+                    mShowFabButton.setImageDrawable(ContextCompat.getDrawable
+                            (getApplicationContext(),R.drawable.star_on));
                     viewModel.insertFavoriteMovie(movie);
-                    Snackbar.make(mCoordinatorLayout,"Фильм добавлен в избранное", Snackbar.LENGTH_LONG)
+                    Snackbar.make(mCoordinatorLayout,"Фильм добавлен в избранное",
+                            Snackbar.LENGTH_LONG)
                             .setAction("ЗАКРЫТЬ", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -249,8 +251,10 @@ public class DetailActivity extends AppCompatActivity {
                             }).show();
                 } else {
                     viewModel.deleteFavoriteMovie(movie);
-                    mShowFabButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.star_offf));
-                    Snackbar.make(mCoordinatorLayout,"Фильм удалён из избранного", Snackbar.LENGTH_LONG)
+                    mShowFabButton.setImageDrawable(ContextCompat.getDrawable
+                            (getApplicationContext(),R.drawable.star_offf));
+                    Snackbar.make(mCoordinatorLayout,"Фильм удалён из избранного",
+                            Snackbar.LENGTH_LONG)
                             .setAction("ЗАКРЫТЬ", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -449,7 +453,8 @@ public class DetailActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(RatingActivity.RATING,MODE_PRIVATE);
         int rating = sharedPreferences.getInt(String.valueOf(id), 0);
         if(rating!=0){
-            btnEstimate.setText(String.format(Locale.getDefault(), "Моя оценка %d", rating));
+            btnEstimate.setText(String.format(Locale.getDefault(),
+                    "Моя оценка %d", rating));
         }
     }
 
@@ -459,7 +464,7 @@ public class DetailActivity extends AppCompatActivity {
         loadRating();
     }
 
-    //    @Override
+//    @Override
 //    public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
 //        if(!b){
 //            youTubePlayer.loadVideo("D0q0QeQbw9U");

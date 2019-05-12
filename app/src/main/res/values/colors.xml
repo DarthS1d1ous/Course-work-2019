@@ -9,4 +9,5 @@
     <color name="TabLayout">#211B3C</color>
     <color name="FloatingActionButton">#2F7070E4</color>
     <color name="GenresItem">#278580D2</color>
+    <color name="FullItem">#3E818181</color>
 </resources>

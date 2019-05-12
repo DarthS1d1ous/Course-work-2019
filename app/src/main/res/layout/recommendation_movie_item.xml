@@ -28,12 +28,13 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:singleLine="true"
-        android:text="TextView"
+        android:text="@string/textview"
         android:textColor="@android:color/background_light"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/ivSmallPoster"
         app:layout_constraintStart_toStartOf="@+id/ivSmallPoster"
-        app:layout_constraintTop_toBottomOf="@+id/ivSmallPoster" />
+        app:layout_constraintTop_toBottomOf="@+id/ivSmallPoster"
+        android:layout_marginLeft="8dp" />
 
 </android.support.constraint.ConstraintLayout>

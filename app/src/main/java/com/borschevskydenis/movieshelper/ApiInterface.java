@@ -4,8 +4,6 @@ import com.borschevskydenis.movieshelper.ResultsFromServer.CreditsById;
 import com.borschevskydenis.movieshelper.ResultsFromServer.Genres;
 import com.borschevskydenis.movieshelper.ResultsFromServer.MovieById;
 import com.borschevskydenis.movieshelper.ResultsFromServer.MovieSearch;
-import com.borschevskydenis.movieshelper.ResultsFromServer.Rofl;
-import com.borschevskydenis.movieshelper.ResultsFromServer.Videos;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

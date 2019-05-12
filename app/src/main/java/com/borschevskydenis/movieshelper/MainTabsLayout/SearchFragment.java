@@ -1,6 +1,7 @@
 package com.borschevskydenis.movieshelper.MainTabsLayout;
 
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -59,6 +60,7 @@ public class SearchFragment extends Fragment {
     }
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -74,6 +76,7 @@ public class SearchFragment extends Fragment {
         movieAdapter = new MovieAdapter();
 
         etSearch.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+
 
         etSearch.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -97,7 +100,8 @@ public class SearchFragment extends Fragment {
                     InputMethodManager inputManager =
                             (InputMethodManager) view.getContext().
                                     getSystemService(Context.INPUT_METHOD_SERVICE);
-                    inputManager.hideSoftInputFromWindow(view.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                    inputManager.hideSoftInputFromWindow(view.getApplicationWindowToken(),
+                            InputMethodManager.HIDE_NOT_ALWAYS);
                     etSearch.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
                     view.clearFocus();
                     btn_clear.setVisibility(View.INVISIBLE);
@@ -152,7 +156,8 @@ public class SearchFragment extends Fragment {
 
                         ApiInterface myInterface = retrofit.create(ApiInterface.class);
 
-                        Call<MovieSearch> call = myInterface.searchMovies(CommonUtils.CATEGORY_MOVIE, CommonUtils.API_KEY, CommonUtils.LANGUAGE_RU, QUERY, PAGE, CommonUtils.INCLUDE_ADULT_FALSE);
+                        Call<MovieSearch> call = myInterface.searchMovies(CommonUtils.CATEGORY_MOVIE,
+                                CommonUtils.API_KEY, CommonUtils.LANGUAGE_RU, QUERY, PAGE, CommonUtils.INCLUDE_ADULT_FALSE);
 
                         call.enqueue(new Callback<MovieSearch>() {
                             @Override
@@ -195,18 +200,18 @@ public class SearchFragment extends Fragment {
      */
     public void performSearch() {
         PAGE = 1;
-
         tvNotFound.setVisibility(View.INVISIBLE);
-
         QUERY = etSearch.getText().toString();
 
-        recyclerViewPosters.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        recyclerViewPosters.setLayoutManager(new GridLayoutManager(getContext(),3));
 
         Retrofit retrofit = RetrofitUtils.createRetrofit();
 
         ApiInterface myInterface = retrofit.create(ApiInterface.class);
 
-        Call<MovieSearch> call = myInterface.searchMovies(CommonUtils.CATEGORY_MOVIE, CommonUtils.API_KEY, CommonUtils.LANGUAGE_RU, QUERY, PAGE, CommonUtils.INCLUDE_ADULT_FALSE);
+        Call<MovieSearch> call = myInterface.searchMovies(CommonUtils.CATEGORY_MOVIE,
+                CommonUtils.API_KEY, CommonUtils.LANGUAGE_RU, QUERY, PAGE,
+                CommonUtils.INCLUDE_ADULT_FALSE);
 
         call.enqueue(new Callback<MovieSearch>() {
             @Override

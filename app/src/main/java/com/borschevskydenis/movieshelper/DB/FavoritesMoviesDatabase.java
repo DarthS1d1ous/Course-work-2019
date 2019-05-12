@@ -21,7 +21,8 @@ public abstract class FavoritesMoviesDatabase extends RoomDatabase {
     public static FavoritesMoviesDatabase getInstance(Context context){
         synchronized (LOCK) {
             if (database == null) {
-                database = Room.databaseBuilder(context, FavoritesMoviesDatabase.class, DB_NAME).build();
+                database = Room.databaseBuilder(context,
+                        FavoritesMoviesDatabase.class, DB_NAME).build();
             }
         }
         return database;
@@ -30,3 +31,4 @@ public abstract class FavoritesMoviesDatabase extends RoomDatabase {
 
     public abstract FavoritesMoviesDao favoritesMoviesDao();
 }
+

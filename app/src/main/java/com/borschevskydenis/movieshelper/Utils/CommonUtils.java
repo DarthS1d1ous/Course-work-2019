@@ -1,7 +1,8 @@
 package com.borschevskydenis.movieshelper.Utils;
 
 public class CommonUtils {
-
+    public static final String API_KEY = "";
+    public static final String API_KEY_YOUTUBE = "";
     public static final String LANGUAGE_RU = "ru-RU";
     public static final String LANGUAGE_US = "en-US";
     public static final String REGION_RU = "RU";
